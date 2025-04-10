@@ -1,23 +1,47 @@
-name: Sync to Hugging Face Space
+name: Sync Fork to HF Space - understanding/Ping
 
 on:
   push:
     branches:
-      - main # Or master, or whichever branch triggers the sync
+      # IMPORTANT: Set the branch on YOUR GitHub fork that triggers the sync
+      - main  # <---- CHANGE 'main' if your fork uses a different branch (e.g., 'master')
 
 jobs:
-  sync:
+  sync-to-hf-space:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Check out the code from your GitHub fork
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Use the latest version
         with:
-          fetch-depth: 0 # Fetches all history
+          # Fetch all history so refs/tags are available if needed
+          fetch-depth: 0
 
-      - name: Push to Hugging Face Space
+      # Step 2: Push the code to your Hugging Face Space
+      - name: Push to Hugging Face Space - understanding/Ping
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }} # Access the stored secret
-        # Replace <Your_HF_Username> and <Your_Space_Name>
+          # Use the HF token stored in GitHub Secrets (ensure you created 'HF_TOKEN')
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          # Your Hugging Face username
+          HF_USERNAME: understanding
+          # Your Hugging Face Space name
+          SPACE_NAME: Ping
+          # IMPORTANT: Set the branch name on YOUR GitHub fork you are pushing FROM
+          SOURCE_BRANCH: main # <---- CHANGE 'main' if your fork uses a different branch (e.g., 'master')
         run: |
-          git remote add hf https://Your_HF_Username:${HF_TOKEN}@huggingface.co/spaces/understanding/Ping
-          git push --force hf main # Use --force carefully, ensures HF matches GitHub main
+          echo "Pushing branch '$SOURCE_BRANCH' to Space: $HF_USERNAME/$SPACE_NAME"
+
+          # Build the target repository URL securely using the token
+          TARGET_REPO="https://%$HF_USERNAME%:$HF_TOKEN@huggingface.co/spaces/$HF_USERNAME/$SPACE_NAME"
+
+          # Add the Hugging Face Space as a remote Git repository
+          git remote add hf "$TARGET_REPO"
+
+          # Push the source branch from the fork to the 'main' branch on the HF Space.
+          # The '--force' flag ensures the HF Space exactly mirrors your GitHub fork's branch.
+          # WARNING: --force overwrites the history on the HF Space's 'main' branch.
+          #          This is standard for sync workflows but confirm it's your desired behavior.
+          git push --force hf "$SOURCE_BRANCH:main"
+
+          echo "Push successful!"
+
