@@ -4,7 +4,7 @@ on:
   push:
     branches:
       # IMPORTANT: Set the branch on YOUR GitHub fork that triggers the sync
-      - main  # <---- CHANGE 'main' if your fork uses a different branch (e.g., 'master')
+      - master  # <---- CHANGE 'main' if your fork uses a different branch (e.g., 'master')
 
 jobs:
   sync-to-hf-space:
