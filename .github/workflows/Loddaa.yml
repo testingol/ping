@@ -1,0 +1,29 @@
+name: Sync testingol/ping to HF Space understanding/Ping
+
+on:
+  push:
+    branches: [main] # Triggers on push to the main branch of testingol/ping
+
+  # to run this workflow manually from the Actions tab on GitHub
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the code from the repository where the action runs (testingol/ping)
+      - uses: actions/checkout@v2 # Using v2 as per your working example, consider updating to v4 later
+        with:
+          fetch-depth: 0 # Gets all history, needed for push
+
+      # Step 2: Push the code to your specific Hugging Face Space
+      - name: Push to understanding/Ping HF Space
+        env:
+          # Use the HF token stored in YOUR REPO's GitHub Secrets
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Build the target URL using your HF username and Space name
+          # Push the 'main' branch from this repo to the 'main' branch on HF Space
+          # Use --force to overwrite the destination
+          git push --force https://understanding:$HF_TOKEN@huggingface.co/spaces/understanding/Ping main
+
