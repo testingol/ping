@@ -1,0 +1,23 @@
+name: Sync to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main # Or master, or whichever branch triggers the sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetches all history
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }} # Access the stored secret
+        # Replace <Your_HF_Username> and <Your_Space_Name>
+        run: |
+          git remote add hf https://Your_HF_Username:${HF_TOKEN}@huggingface.co/spaces/understanding/Ping
+          git push --force hf main # Use --force carefully, ensures HF matches GitHub main
